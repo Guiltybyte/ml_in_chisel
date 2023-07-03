@@ -4,7 +4,7 @@ ThisBuild / scalaVersion     := "2.13.8"
 ThisBuild / version          := "0.1.0"
 ThisBuild / organization     := "Gaelstat"
 
-val chiselVersion = "3.5.4"
+val chiselVersion = "3.5.6"
 
 lazy val root = (project in file("."))
   .settings(
@@ -22,4 +22,3 @@ lazy val root = (project in file("."))
     ),
     addCompilerPlugin("edu.berkeley.cs" % "chisel3-plugin" % chiselVersion cross CrossVersion.full),
   )
-
