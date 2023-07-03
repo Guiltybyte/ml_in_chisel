@@ -11,3 +11,14 @@ his [Machine Learning in C (Episode 1)](https://www.youtube.com/watch?v=PGSba51a
 To summarise, using very rudimentiary mathematics, this HDL describes a circuit which
 can train a single parameter function (or neuron at a stretch) to fit the training data,
 to produce a model which approximates a 2 times multiplier.
+
+## Instructions
+To download the source code and run the simulation:
+
+```
+git clone https://github.com/Guiltybyte/ml_in_chisel
+cd ml_in_chisel
+sbt test
+```
+
+In the test ouput you should see that w, the tunable weight of the single neuron/parameter model is approximately 2.
