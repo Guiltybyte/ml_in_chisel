@@ -13,18 +13,26 @@ can train a single parameter function (or neuron at a stretch) to fit the traini
 to produce a model which approximates a 2 times multiplier.
 
 ## Instructions
-To download the source code and run the simulation:
+1. Download the source code
 
 ```
 git clone https://github.com/Guiltybyte/ml_in_chisel
 cd ml_in_chisel
-sbt test
 ```
 
-In the test ouput you should see that w, the tunable weight of the single neuron/parameter model is approximately 2.
+2. Run the simulation
 
+```
+make test
+```
+You should see that the final weight is approximately 2.0
 
-## TODO
-- Refactor and clean up the design code
-- Setup scripts for generating verilog from chisel and performing an out of context build with the [VTR](https://verilogtorouting.org/) flow,
-i.e. a makefile
+3. Run a build with VtR
+
+If you have [VtR](https://verilogtorouting.org/) installed, you can run the following to run a "build"
+(synthesis -> optimization -> placing -> routing) with the following command
+```
+make build
+```
+generated `*.blif` files and logs from the VtR flow run will be in: `generated/vtr/TopML`  
+**Note** currently there is no script included in this repository to generate FASM and/or bitsreams.
