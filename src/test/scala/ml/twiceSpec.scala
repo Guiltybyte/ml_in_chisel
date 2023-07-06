@@ -8,10 +8,23 @@ import org.scalatest.freespec.AnyFreeSpec
 
 class TestML extends AnyFreeSpec with ChiselScalatestTester {
   "DUT final w should be approx 2.0" in {
-    test(new TopML) { dut =>
-      dut.clock.step(999)
-      println("final w is: " + dut.io.w.peekDouble())
-      println("final cost is" + dut.io.cost.peekDouble())
+    test(new TopML).withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
+      dut.clock.setTimeout(10_000)
+      val epochs = 10
+
+      // Epoch 1 takes 4 cycles, rest take 5
+      dut.clock.step(4)
+      dut.io.valid.expect(true)
+
+      for(i <- 1 until epochs) {
+        println("weight: " + dut.io.w.peekDouble())
+        println("cost  : " + dut.io.cost.peekDouble())
+        println("dcost : " + dut.io.dcost.peekDouble())
+        println("valid : " + dut.io.valid.peekBoolean())
+        dut.clock.step(5)
+        dut.io.valid.expect(true)
+        // should always be true at the end of an epoch
+      }
     }
   }
 }

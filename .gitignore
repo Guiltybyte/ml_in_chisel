@@ -343,5 +343,6 @@ hs_err_pid*
 # Scala and Chisel autogen (metals and sbt) stuff to ignore
 .bloop
 .bsp
+.metals
 project/
 test_run_dir

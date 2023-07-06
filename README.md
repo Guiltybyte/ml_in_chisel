@@ -22,3 +22,7 @@ sbt test
 ```
 
 In the test ouput you should see that w, the tunable weight of the single neuron/parameter model is approximately 2.
+
+
+## TODO
+- Setup scripts for generating verilog from chisel and performing an out of context build with the [VTR](https://verilogtorouting.org/) flow
