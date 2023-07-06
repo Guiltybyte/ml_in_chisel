@@ -9,13 +9,18 @@ class TopML(tw: Int, fw: Int) extends Module {
     val w      = Output(FixedPoint(32.W, 8.BP))
     val cost   = Output(FixedPoint(32.W, 8.BP))
     val dcost  = Output(FixedPoint(32.W, 8.BP))
-    val ecost  = Output(FixedPoint(32.W, 8.BP))
     val valid  = Output(Bool())
   })
 
   // ML related params
-  val EPSILON  = 100E-3
+  val EPSILON  = 1E-3
   val RATE     = 100E-3
+
+
+  def model(x: FixedPoint, w: FixedPoint): FixedPoint = w * x
+  def cost(ya: FixedPoint, ye: FixedPoint): FixedPoint = (ya - ye) * (ya - ye)
+  def avrg(t: FixedPoint): FixedPoint = t >> chisel3.util.log2Ceil(trainingDataY.length)
+
 
   //-----------//
   // SECTION 0 //
@@ -24,15 +29,16 @@ class TopML(tw: Int, fw: Int) extends Module {
   // Define Training Data and load into LUTs (treat as ROM)
 
   val trainingDataX = VecInit(0.F(tw.W, fw.BP),
-                              1.F(tw.W, fw.BP), 
+                              1.F(tw.W, fw.BP),
                               2.F(tw.W, fw.BP),
                               3.F(tw.W, fw.BP))
 
-
-  val trainingDataY = VecInit(0.F(tw.W, fw.BP), 
-                              2.F(tw.W, fw.BP), 
+  val trainingDataY = VecInit(0.F(tw.W, fw.BP),
+                              2.F(tw.W, fw.BP),
                               4.F(tw.W, fw.BP),
                               6.F(tw.W, fw.BP))
+
+
 
   // Used to specify what element of the training data we are on, increments every cycle
   val index = RegInit(0.U((chisel3.util.log2Ceil(trainingDataY.length) + 1).W))
@@ -43,16 +49,16 @@ class TopML(tw: Int, fw: Int) extends Module {
   println("initial weight: " + initialWeight)
   val weight = RegInit(initialWeight.F(tw.W, fw.BP))
 
-  val x        = Wire(FixedPoint(tw.W, fw.BP))
-  val y        = Wire(FixedPoint(tw.W, fw.BP))
-  val yepsilon = Wire(FixedPoint(tw.W, fw.BP))
+  val x              = Wire(FixedPoint(tw.W, fw.BP))
+  val y              = Wire(FixedPoint(tw.W, fw.BP))
+  val yepsilon       = Wire(FixedPoint(tw.W, fw.BP))
   val EPSILON_FIXED  = EPSILON.F(tw.W, fw.BP)
-  val RATE_FIXED  = RATE.F(tw.W, fw.BP)
+  val RATE_FIXED     = RATE.F(tw.W, fw.BP)
 
   // calculate y (model output) and also (ahead of time) yepsilon (used in the cost function gradient approximation)
-  x := trainingDataX(index)
-  y := weight * x
-  yepsilon := (weight + EPSILON_FIXED) * x
+  x        := trainingDataX(index)
+  y        := model(x, weight)
+  yepsilon := model(x, weight + EPSILON_FIXED)
 
 
   // each training data element calc takes a clock cycle
@@ -69,11 +75,11 @@ class TopML(tw: Int, fw: Int) extends Module {
   val yexpected = Wire(FixedPoint(tw.W, fw.BP))
   val c         = Wire(FixedPoint(tw.W, fw.BP))
   val cepsilon  = Wire(FixedPoint(tw.W, fw.BP))
-  yexpected := trainingDataY(index) // potentially dangerous if I do not properly pipeline
+  yexpected := trainingDataY(index)
 
   // cost function calculation for individual training elements
-  c := (y - yexpected) * (y - yexpected)
-  cepsilon := (yepsilon - yexpected) * (yepsilon - yexpected)
+  c        := cost(y, yexpected)
+  cepsilon := cost(yepsilon, yexpected)
 
   val cTotal        = RegInit(0.F(tw.W, fw.BP))
   val cEpsilonTotal = RegInit(0.F(tw.W, fw.BP))
@@ -82,17 +88,13 @@ class TopML(tw: Int, fw: Int) extends Module {
   when(index === indexMaxVal)  {
     cTotal := 0.F(tw.W, fw.BP)
     cEpsilonTotal := 0.F(tw.W, fw.BP)
+    costFunctionCalculated := true.B
   }.otherwise {
     cTotal := cTotal + c
     cEpsilonTotal := cEpsilonTotal + cepsilon
+    costFunctionCalculated := false.B
   }
 
-  // When index is equal to max value, cost function calculation is done
-  when(index === indexMaxVal)  {
-    costFunctionCalculated := true.B
-    }.otherwise {
-    costFunctionCalculated := false.B
-    }
 
   //-----------//
   // SECTION 1 //
@@ -104,16 +106,18 @@ class TopML(tw: Int, fw: Int) extends Module {
   val cAverageEpsilon = Wire(FixedPoint(tw.W, fw.BP))
   
   // equivalent to division by 2^2 = 4 which happens to be the length of the training data
-  cAverage := cTotal >> 2
-  cAverageEpsilon := cEpsilonTotal >> 2 /// log2(trainingDataY.length)
+  cAverage        := avrg(cTotal)
+  cAverageEpsilon := avrg(cEpsilonTotal)
 
   // constant multiplication to approx division
   val E = 1/EPSILON
   val E_FIXED = E.F(tw.W, fw.BP)
   val dc = Wire(FixedPoint(tw.W, fw.BP))
+  val subr = Wire(FixedPoint(tw.W, fw.BP))
 
   // finally calculate the finite difference, as a way to approximate the derivative / gradient
   dc := ((cAverageEpsilon - cAverage) * E_FIXED)
+  subr := cAverageEpsilon - cAverage
 
   // Update w
   when(costFunctionCalculated) {
@@ -123,10 +127,10 @@ class TopML(tw: Int, fw: Int) extends Module {
   // Connect outputs
   io.w      := weight
   io.cost   := cAverage
-  io.ecost  := cAverageEpsilon
   io.dcost  := dc
   io.valid  := costFunctionCalculated
 }
+
 // command: $ sbt run
 object emitTwiceVerilog extends App {
   emitVerilog (new TopML(32, 16), Array("--target-dir", "generated/chisel"))

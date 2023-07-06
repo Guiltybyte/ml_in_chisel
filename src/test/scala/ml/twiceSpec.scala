@@ -17,11 +17,11 @@ class TestML extends AnyFreeSpec with ChiselScalatestTester {
       dut.io.valid.expect(true)
       for(i <- 1 until epochs) {
         println("------------------------------------------")
-        println("Epoch: " + (i - 1))
-        println("weight: " + dut.io.w.peekDouble())
-        println("cost  : " + dut.io.cost.peekDouble())
-        println("dcost : " + dut.io.dcost.peekDouble())
-        println("valid : " + dut.io.valid.peekBoolean())
+        println("Epoch        : " + (i - 1))
+        println("weight       : " + dut.io.w.peekDouble())
+        println("cost         : " + dut.io.cost.peekDouble())
+        println("dcost        : " + dut.io.dcost.peekDouble())
+        println("valid        : " + dut.io.valid.peekBoolean())
         dut.clock.step(5)
         dut.io.valid.expect(true) // should always be true at the end of an epoch
       }

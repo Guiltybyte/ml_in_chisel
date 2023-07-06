@@ -15,24 +15,24 @@ to produce a model which approximates a 2 times multiplier.
 ## Instructions
 1. Download the source code
 
-```
-git clone https://github.com/Guiltybyte/ml_in_chisel
-cd ml_in_chisel
-```
+  ```
+  git clone https://github.com/Guiltybyte/ml_in_chisel
+  cd ml_in_chisel
+  ```
 
 2. Run the simulation
 
-```
-make test
-```
-You should see that the final weight is approximately 2.0
+  ```
+  make test
+  ```
+  You should see that the final weight is approximately 2.0
 
 3. Run a build with VtR
 
-If you have [VtR](https://verilogtorouting.org/) installed, you can run the following to run a "build"
-(synthesis -> optimization -> placing -> routing) with the following command
-```
-make build
-```
-generated `*.blif` files and logs from the VtR flow run will be in: `generated/vtr/TopML`  
-**Note** currently there is no script included in this repository to generate FASM and/or bitsreams.
+  If you have [VtR](https://verilogtorouting.org/) installed, you can run the following to run a "build"
+  (synthesis -> optimization -> placing -> routing) with the following command
+  ```
+  make build
+  ```
+  generated `*.blif` files and logs from the VtR flow run will be in: `generated/vtr/TopML`  
+  **Note** currently there is no script included in this repository to generate FASM and/or bitsreams.

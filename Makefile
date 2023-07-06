@@ -1,5 +1,5 @@
 # ONESHELL means make will run all recipes within a single shell
-.ONESHELL:
+# .ONESHELL:
 
 TOP_MODULE = TopML
 VTR_ROOT = /home/jordanm/VtR/vtr-verilog-to-routing
@@ -22,3 +22,8 @@ build:
 		${VTR_ROOT}/vtr_flow/arch/timing/EArch.xml \
 		-temp_dir ${BUILD_DIR} \
 		--route_chan_width 100
+
+fasm:
+	. ${VTR_ROOT}/.venv/bin/activate
+	cd ${BUILD_DIR}
+	${VTR_ROOT}/build/utils/fasm/genfasm ${BUILD_DIR}/EArch.xml ${BUILD_DIR}/TopML.abc.blif
