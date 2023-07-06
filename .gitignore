@@ -346,3 +346,5 @@ hs_err_pid*
 .metals
 project/
 test_run_dir
+.nvim
+generated

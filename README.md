@@ -25,4 +25,6 @@ In the test ouput you should see that w, the tunable weight of the single neuron
 
 
 ## TODO
-- Setup scripts for generating verilog from chisel and performing an out of context build with the [VTR](https://verilogtorouting.org/) flow
+- Refactor and clean up the design code
+- Setup scripts for generating verilog from chisel and performing an out of context build with the [VTR](https://verilogtorouting.org/) flow,
+i.e. a makefile
