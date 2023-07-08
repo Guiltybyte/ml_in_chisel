@@ -11,17 +11,24 @@ class TestML extends AnyFreeSpec with ChiselScalatestTester {
       dut.clock.setTimeout(5_000) // default timeout is 1000
       val epochs = 10
 
+      var weight : Double = 0
+      var cost   : Double = 0
+      var dcost  : Double = 0
+
       // Epoch 1 takes 4 cycles, rest take 5, as new w value has to be loaded in
       // TODO: derive clock step from training data in DUT
       dut.clock.step(4)
       dut.io.valid.expect(true)
       for(i <- 1 until epochs) {
+        weight = dut.io.w.peekDouble()
+        cost   = dut.io.cost.peekDouble()
+        dcost  = dut.io.dcost.peekDouble()
+
         println("------------------------------------------")
         println("Epoch        : " + (i - 1))
-        println("weight       : " + dut.io.w.peekDouble())
-        println("cost         : " + dut.io.cost.peekDouble())
-        println("dcost        : " + dut.io.dcost.peekDouble())
-        println("valid        : " + dut.io.valid.peekBoolean())
+        println(f"weight       : $weight%4.16f")
+        println(f"cost         : $cost%4.16f")
+        println(f"dcost        : $dcost%4.16f")
         dut.clock.step(5)
         dut.io.valid.expect(true) // should always be true at the end of an epoch
       }

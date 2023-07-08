@@ -4,8 +4,8 @@
 TOP_MODULE = TopML
 VTR_ROOT = /home/jordanm/VtR/vtr-verilog-to-routing
 PROJ_ROOT = $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
-BUILD_DIR = $(PROJ_ROOT)/generated/vtr/$(TOP_MODULE)
-VERILOG_DIR = $(PROJ_ROOT)/generated/chisel
+BUILD_DIR = $(PROJ_ROOT)generated/vtr/$(TOP_MODULE)
+VERILOG_DIR = $(PROJ_ROOT)generated/chisel
 
 test:
 	sbt test

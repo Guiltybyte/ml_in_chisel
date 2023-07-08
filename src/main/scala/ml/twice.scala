@@ -4,6 +4,7 @@ import chisel3._
 import chisel3.experimental._
 import chisel3.stage.ChiselStage
 
+// TODO figure out why values dont go negative as expected
 class TopML(tw: Int, fw: Int) extends Module {
   val io = IO(new Bundle {
     val w      = Output(FixedPoint(32.W, 8.BP))
@@ -45,7 +46,7 @@ class TopML(tw: Int, fw: Int) extends Module {
   val indexMaxVal : UInt = trainingDataY.length.U(index.getWidth.W)
 
   // initialize Weight to Fixed Point rep of random value between 0 and 10
-  val initialWeight = scala.math.random()*10.0
+  val initialWeight = 1.0
   println("initial weight: " + initialWeight)
   val weight = RegInit(initialWeight.F(tw.W, fw.BP))
 
@@ -110,14 +111,12 @@ class TopML(tw: Int, fw: Int) extends Module {
   cAverageEpsilon := avrg(cEpsilonTotal)
 
   // constant multiplication to approx division
-  val E = 1/EPSILON
+  val E       = 1/EPSILON
   val E_FIXED = E.F(tw.W, fw.BP)
-  val dc = Wire(FixedPoint(tw.W, fw.BP))
-  val subr = Wire(FixedPoint(tw.W, fw.BP))
+  val dc   = Wire(FixedPoint(tw.W, fw.BP))
 
   // finally calculate the finite difference, as a way to approximate the derivative / gradient
   dc := ((cAverageEpsilon - cAverage) * E_FIXED)
-  subr := cAverageEpsilon - cAverage
 
   // Update w
   when(costFunctionCalculated) {
