@@ -46,7 +46,7 @@ class TopML(tw: Int, fw: Int) extends Module {
   val indexMaxVal : UInt = trainingDataY.length.U(index.getWidth.W)
 
   // initialize Weight to Fixed Point rep of random value between 0 and 10
-  val initialWeight = 1.0
+  val initialWeight = scala.math.random()*10.0
   println("initial weight: " + initialWeight)
   val weight = RegInit(initialWeight.F(tw.W, fw.BP))
 
