@@ -26,4 +26,4 @@ build:
 fasm:
 	. ${VTR_ROOT}/.venv/bin/activate
 	cd ${BUILD_DIR}
-	${VTR_ROOT}/build/utils/fasm/genfasm ${BUILD_DIR}/EArch.xml ${BUILD_DIR}/TopML.abc.blif
+	${VTR_ROOT}/build/utils/fasm/genfasm ${BUILD_DIR}/EArch.xml ${BUILD_DIR}/TopML.abc.blif -h

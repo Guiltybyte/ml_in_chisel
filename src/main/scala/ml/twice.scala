@@ -4,7 +4,6 @@ import chisel3._
 import chisel3.experimental._
 import chisel3.stage.ChiselStage
 
-// TODO figure out why values dont go negative as expected
 class TopML(tw: Int, fw: Int) extends Module {
   val io = IO(new Bundle {
     val w      = Output(FixedPoint(32.W, 8.BP))
@@ -15,7 +14,7 @@ class TopML(tw: Int, fw: Int) extends Module {
 
   // ML related params
   val EPSILON  = 1E-3
-  val RATE     = 100E-3
+  val RATE     = 10E-3
 
 
   def model(x: FixedPoint, w: FixedPoint): FixedPoint = w * x

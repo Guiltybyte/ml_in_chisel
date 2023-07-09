@@ -9,15 +9,16 @@ class TestML extends AnyFreeSpec with ChiselScalatestTester {
     // command: $ sbt test
     test(new TopML(32, 16)).withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
       dut.clock.setTimeout(5_000) // default timeout is 1000
-      val epochs = 10
+     
+      val epochs = 100
+      val clock_steps_per_epoch =  dut.trainingDataX.length + 1
 
       var weight : Double = 0
       var cost   : Double = 0
       var dcost  : Double = 0
 
       // Epoch 1 takes 4 cycles, rest take 5, as new w value has to be loaded in
-      // TODO: derive clock step from training data in DUT
-      dut.clock.step(4)
+      dut.clock.step(clock_steps_per_epoch - 1)
       dut.io.valid.expect(true)
       for(i <- 1 until epochs) {
         weight = dut.io.w.peekDouble()
@@ -29,7 +30,7 @@ class TestML extends AnyFreeSpec with ChiselScalatestTester {
         println(f"weight       : $weight%4.16f")
         println(f"cost         : $cost%4.16f")
         println(f"dcost        : $dcost%4.16f")
-        dut.clock.step(5)
+        dut.clock.step(clock_steps_per_epoch)
         dut.io.valid.expect(true) // should always be true at the end of an epoch
       }
       println("------------------------------------------")
