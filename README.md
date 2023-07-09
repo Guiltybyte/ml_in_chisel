@@ -12,6 +12,13 @@ To summarise, using very rudimentiary mathematics, this HDL describes a circuit 
 can train a single parameter function (or neuron at a stretch) to fit the training data,
 to produce a model which approximates a 2 times multiplier.
 
+## Initial Design Doc
+The original "design document", which I used to reason about the general 'flow'
+of the hardware implementation of this simple ML algorithm. This is no formal
+design document, and was just for my own understanding and reasoning. It does
+however provide some important context for the RTL in this repo.
+![rough design document](machine_learning_in_chisel.png)
+
 ## Instructions
 1. Download the source code
 
